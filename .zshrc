@@ -12,7 +12,6 @@ promptinit
 prompt fire red magenta blue white white white
 # munge prompt to contain current devsite
 PS1=`echo $PS1 | sed -e 's/%P}/%P} | %F{blue}$devsite/'`
-
 setopt hist_ignore_all_dups
 setopt auto_pushd
 setopt menu_complete
@@ -22,7 +21,8 @@ alias gvimnofork='cyg-wrapper.sh "C:/Program Files (x86)/vim/vim72/gvim.exe" --b
 alias gvim="gvimnofork --fork=1"
 alias gvimr='gvim --remote'
 
-alias gvz='gvim ~/.zshrc'
+# edit gvimrc and update it on github
+alias gvz='gvimnofork ~/.zshrc && cp ~/.zshrc ~/zshrc && cd ~/zshrc && git commit -a -m "automatic gitpush zshrc" && popd'
 alias sz='source ~/.zshrc'
 alias ls='ls --color -G'
 alias lsa='ls -altrG'
