@@ -22,8 +22,8 @@ alias gvim="gvimnofork --fork=1"
 alias gvimr='gvim --remote'
 
 # edit gvimrc and update it on github
-alias github_zshrc="cp ~/.zshrc ~/zshrc && cd ~/zshrc && git commit -a -m "automatic gitpush zshrc" && git push origin master && popd > /dev/null"
-alias gvz='gvimnofork ~/.zshrc & github_zshrc'
+alias github_zshrc="cp ~/.zshrc ~/zshrc && cd ~/zshrc && git commit -a -m 'automatic gitpush zshrc' && popd > /dev/null & git push origin master"
+alias gvz='gvimnofork ~/.zshrc && github_zshrc'
 alias sz='source ~/.zshrc'
 alias ls='ls --color -G'
 alias lsa='ls -altrG'
