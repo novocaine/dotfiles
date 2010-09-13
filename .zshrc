@@ -47,7 +47,7 @@ setbranch() {
 # switch branches
 alias 32='export xbranch="1.32.999"; setbranch;'
 alias 33='export xbranch="1.33.999"; setbranch;'
-alias rt='export xbranch="1.34.999"; setbranch;' 
+alias tr='export xbranch="1.34.999"; setbranch;' 
 
 alias xpt='cdb; cd src/py/xpt';
 alias www='cdb; cd data/wwwroot';
@@ -94,6 +94,14 @@ alias stalk='python bin/runNightstalker_win32.py -c "Single-Instance Site (No IP
 # disable import tagging for ctags; this avoids always jumping to the bazillion
 # import definitions for a given method
 alias ctags='ctags --python-kinds=-i'
+
+function mktags () {
+    for dir in ~/xplanbase/version/1.34.999/src/py ~/xplanbase/version/1.34.999/src/cxx
+    do
+        cd $dir && ctags -R
+    done
+}    
+
 alias mkxt='sitectrl kill $devsite && make FAST=1 -C src/cxx -j8 && rtr'
 alias mkxslm='sitectrl kill $devsite && make FAST=1 -C src/xslm && rtr'
 alias xcon='telnet localhost 18052'
@@ -126,5 +134,7 @@ function ts () {
     then
         2=".";
     fi
-    $TORTOISE_PROC /command:$1 /path:$2
+    cygstart $TORTOISE_PROC /command:$1 /path:$2
 }
+
+alias ex="explorer"
