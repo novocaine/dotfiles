@@ -51,10 +51,14 @@ alias tr='export xbranch="1.34.999"; setbranch;'
 
 alias xpt='cdb; cd src/py/xpt';
 alias www='cdb; cd data/wwwroot';
+alias wwwroot=www;
 alias js='www; cd js';
 alias css='www; cd css';
 alias ih='cdb; cd data/ihtml';
+alias ihtml=ih;
 alias cxx='cdb; cd src/cxx';
+alias hf='cd ~/xplanbase/hotfix';
+alias hotfix=hf;
 
 alias ack='ack --ignore-dir js.min --ignore-dir css.min';
 export ACK_PAGER='less -R'
@@ -78,6 +82,11 @@ function restart_site() {
     sitectrl status | grep "$1."    
 }
 
+function kill_site() {
+    echo "Killing site $devsite"
+    sitectrl kill $1
+}
+
 alias webget='curl -x webironport:80 -s'
 ABC_RSS="http://www.abc.net.au/news/syndicate/topstoriesrss.xml"
 
@@ -90,20 +99,28 @@ function random_abc_headline() {
 }
 
 alias rtr='random_abc_headline & restart_site $devsite';
+alias ktr='kill_site $devsite';
+
 alias stalk='python bin/runNightstalker_win32.py -c "Single-Instance Site (No IPS)" -v ../var/jamesdev'
 # disable import tagging for ctags; this avoids always jumping to the bazillion
 # import definitions for a given method
 alias ctags='ctags --python-kinds=-i'
 
 function mktags () {
-    for dir in ~/xplanbase/version/1.34.999/src/py ~/xplanbase/version/1.34.999/src/cxx
+    for dir in ~/xplanbase/version/1.34.999/src/py ~/xplanbase/version/1.34.999/src/cxx ~/xplanbase/version/1.34.999/test/py ~/xplanbase/version/1.34.999/include ~/xplanbase/build/vc90/omniORB-4.1-20100317 ~/xplanbase/version/1.34.999/data/wwwroot/js
     do
         cd $dir && ctags -R
     done
 }    
 
-alias mkxt='sitectrl kill $devsite && make FAST=1 -C src/cxx -j8 && rtr'
-alias mkxslm='sitectrl kill $devsite && make FAST=1 -C src/xslm && rtr'
+alias mkxt='ktr && mk -C src/cxx && rtr'
+
+function mkk () {
+    ktr && mkw $* && rtr
+}
+
+alias mkxl='ktr && mk -C src/xlsm -j8'
+alias mkcx='ktr && mk -C src/cxx'
 alias xcon='telnet localhost 18052'
 alias mk='make FAST=1'
 alias al='tail -f ~/xplanbase/var/$devsite/log/access.log | ack -v "\.js|\.png|\.gif|\.css"'
@@ -138,3 +155,8 @@ function ts () {
 }
 
 alias ex="explorer"
+alias ch="sh ~/xplanbase/hotfix/bin/compile_hotfix.sh"
+
+function jsl () {
+    ~/bin/jslint $1 | grep -v 'Implied global'
+}
