@@ -20,7 +20,9 @@ set textwidth=79
 set ignorecase
 filetype on
 
-set tags=c:\xplanbase\version\1.34.999\src\py\tags,c:\xplanbase\version\1.34.999\src\cxx\tags,c:\xplanbase\build\vc90\omniORB-4.1.4\tags,c:\xplanbase\version\1.34.999\test\py\tags,c:\xplanbase\version\1.34.999\include\tags,c:\xplanbase\version\1.34.999\data\wwwroot\js\tags
+set cdpath=,c:\xplanbase\version\1.35.999\data\wwwroot
+
+set tags=c:\xplanbase\version\1.35.999\src\py\tags,c:\xplanbase\version\1.35.999\src\cxx\tags,c:\xplanbase\build\vc90\omniORB-4.1.4\tags,c:\xplanbase\version\1.35.999\test\py\tags,c:\xplanbase\version\1.35.999\include\tags,c:\xplanbase\version\1.35.999\data\wwwroot\js\tags
 set statusline=%<%F%h%m%r%h%w%y\ [%l,%v]\ %P
 set laststatus=2
 
@@ -57,3 +59,13 @@ map ,* :call CommentLinePincer('/* ', ' */')<CR>+
 noremap <silent> ,/ :call CommentLineToEnd('// ')<CR>+
 noremap <silent> ,< :call CommentLinePincer('<!-- ', ' -->')<CR>+
 
+map <F2> :cd %:p:h<CR>
+
+" sticky shifts
+vnoremap < <gv
+vnoremap > >gv
+
+map <F2> :NERDTreeToggle<CR>
+
+" notes
+" cd %:h cwd to dir of open file

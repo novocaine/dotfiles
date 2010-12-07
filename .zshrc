@@ -2,6 +2,8 @@ export HOME="/cygdrive/c/users/jsalter"
 HISTFILE=~/.histfile
 HISTSIZE=1000
 SAVEHIST=1000
+xbranch=1.35.999
+BRANCHDIR=~/xplanbase/version/$xbranch
 
 autoload -U compinit
 compinit
@@ -13,13 +15,17 @@ prompt fire red magenta blue white white white
 # munge prompt to contain current devsite
 PS1=`echo $PS1 | sed -e 's/%P}/%P} | %F{blue}$devsite/'`
 setopt hist_ignore_all_dups
+setopt extended_history
+setopt share_history
 setopt auto_pushd
 setopt menu_complete
 setopt auto_cd
+setopt hist_verify
 
 alias gvimnofork='cyg-wrapper.sh "C:/Program Files (x86)/vim/vim72/gvim.exe" --binary-opt=-c,--cmd,-T,-t,--servername,--remote-send,--remote-expr'
 alias gvim="gvimnofork --fork=1"
 alias gvimr='gvim --remote'
+alias g=gvimr
 
 # edit gvimrc and update it on github
 alias github_zshrc="cp ~/.zshrc ~/zshrc && cp ~/_vimrc ~/zshrc && cd ~/zshrc && git commit -a -m 'automatic gitpush zshrc' && git push origin master && popd > /dev/null"
@@ -33,8 +39,8 @@ export PATH=/cygdrive/c/python26:/cygdrive/c/python26/Tools/Scripts:~/bin:$PATH
 alias cygset='cygstart ~/bin/cygset'
 export http_proxy=http://webironport
 
-alias log='tail -f ~/xplanbase/var/jamesdev/log/server.log'
-alias cxxlog='tail -f ~/xplanbase/var/jamesdev/log/cxxserver.log'
+alias log='tail -f -n 100 ~/xplanbase/var/$devsite/log/server.log'
+alias -g cxxlog='~/xplanbase/var/$devsite/log/cxxserver.log'
 export SVN_EDITOR="gvim -f"
 
 alias cdb='cd ~/xplanbase/version/$xbranch'
@@ -47,7 +53,8 @@ setbranch() {
 # switch branches
 alias 32='export xbranch="1.32.999"; setbranch;'
 alias 33='export xbranch="1.33.999"; setbranch;'
-alias tr='export xbranch="1.34.999"; setbranch;' 
+alias 34='export xbranch="1.34.999"; setbranch;'
+alias tr='export xbranch="1.35.999"; setbranch;' 
 
 alias xpt='cdb; cd src/py/xpt';
 alias www='cdb; cd data/wwwroot';
@@ -59,6 +66,7 @@ alias ihtml=ih;
 alias cxx='cdb; cd src/cxx';
 alias hf='cd ~/xplanbase/hotfix';
 alias hotfix=hf;
+alias var='cd ~/xplanbase/var';
 
 alias ack='ack --ignore-dir js.min --ignore-dir css.min';
 export ACK_PAGER='less -R'
@@ -107,7 +115,7 @@ alias stalk='python bin/runNightstalker_win32.py -c "Single-Instance Site (No IP
 alias ctags='ctags --python-kinds=-i'
 
 function mktags () {
-    for dir in ~/xplanbase/version/1.34.999/src/py ~/xplanbase/version/1.34.999/src/cxx ~/xplanbase/version/1.34.999/test/py ~/xplanbase/version/1.34.999/include ~/xplanbase/build/vc90/omniORB-4.1-20100317 ~/xplanbase/version/1.34.999/data/wwwroot/js
+    for dir in $BRANCHDIR/src/py $BRANCHDIR/src/cxx $BRANCHDIR/test/py $BRANCHDIR/include ~/xplanbase/build/vc90/omniORB-4.1-20100317 $BRANCHDIR/data/wwwroot/js
     do
         cd $dir && ctags -R
     done
@@ -124,9 +132,6 @@ alias mkcx='ktr && mk -C src/cxx'
 alias xcon='telnet localhost 18052'
 alias mk='make FAST=1'
 alias al='tail -f ~/xplanbase/var/$devsite/log/access.log | ack -v "\.js|\.png|\.gif|\.css"'
-
-# only permit svn in cygwin terminals i.e. console2
-[[ $TERM != 'cygwin' ]] && alias svn='echo not in svn console: '
 
 export TERM=ansi
 
@@ -159,4 +164,11 @@ alias ch="sh ~/xplanbase/hotfix/bin/compile_hotfix.sh"
 
 function jsl () {
     ~/bin/jslint $1 | grep -v 'Implied global'
+}
+
+# setup XPLAN vars
+source ~/bin/xplan_env.sh
+
+function f() {
+    find . -name "$1"
 }
