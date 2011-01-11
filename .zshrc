@@ -106,7 +106,25 @@ function random_abc_headline() {
     webget $ABC_RSS | python "c:\users\jsalter\bin\xml_printer.py" random
 }
 
-alias rtr='random_abc_headline & restart_site $devsite';
+function devsite_from_pwd() {
+    ver=`echo $PWD | grep -o 'version/\([^/]*\)' | sed -e 's/version\///'`;
+    devsite=${site_instances[${ver}]};
+}
+
+# map site instances to dir names
+typeset -A site_instances;
+site_instances=(1.33.999 133server 1.34.999 134server 1.35.999 jamesdev);
+
+function rtr() {
+    devsite_from_pwd;
+    random_abc_headline & restart_site $devsite;
+}
+
+function ktr() {
+    devsite_from_pwd;
+    kill_site $devsite;
+}
+
 alias ktr='kill_site $devsite';
 
 alias stalk='python bin/runNightstalker_win32.py -c "Single-Instance Site (No IPS)" -v ../var/jamesdev'
@@ -148,6 +166,7 @@ alias sr="svn resolve --accept=working"
 alias su="svn update"
 alias sc="svn commit"
 alias sd="svn diff"
+alias tdiff="/cygdrive/c/Program\ Files/TortoiseSVN/bin/TortoiseMerge.exe"
 
 TORTOISE_PROC="/cygdrive/c/Program Files/TortoiseSVN/bin/TortoiseProc.exe"
 
@@ -172,3 +191,7 @@ source ~/bin/xplan_env.sh
 function f() {
     find . -name "$1"
 }
+
+alias -g ...='../..'
+alias -g ....='../../..'
+alias -g .....='../../../..'
