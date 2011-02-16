@@ -8,6 +8,8 @@ BRANCHDIR=~/xplanbase/version/$xbranch
 autoload -U compinit
 compinit
 
+. ~/.zsh_completion
+
 autoload -U promptinit
 promptinit
 
@@ -22,13 +24,16 @@ setopt menu_complete
 setopt auto_cd
 setopt hist_verify
 
+# ignore these in autocomplete
+fignore=('*.pyc' '*.dat' '~')
+
 alias gvimnofork='cyg-wrapper.sh "C:/Program Files (x86)/vim/vim72/gvim.exe" --binary-opt=-c,--cmd,-T,-t,--servername,--remote-send,--remote-expr'
 alias gvim="gvimnofork --fork=1"
 alias gvimr='gvim --remote'
 alias g=gvimr
 
 # edit gvimrc and update it on github
-alias github_zshrc="cp ~/.zshrc ~/zshrc && cp ~/_vimrc ~/zshrc && cd ~/zshrc && git commit -a -m 'automatic gitpush zshrc' && git push origin master && popd > /dev/null"
+alias github_zshrc="cp ~/.zshrc ~/.zsh_completion ~/zshrc && cp ~/_vimrc ~/zshrc && cd ~/zshrc && git commit -a -m 'automatic gitpush zshrc' && git push origin master && popd > /dev/null"
 alias gvz='gvim ~/.zshrc'
 alias sz='source ~/.zshrc'
 alias ls='ls --color -G'
@@ -39,8 +44,36 @@ export PATH=/cygdrive/c/python26:/cygdrive/c/python26/Tools/Scripts:~/bin:$PATH
 alias cygset='cygstart ~/bin/cygset'
 export http_proxy=http://webironport
 
-alias log='tail -f -n 100 ~/xplanbase/var/$devsite/log/server.log'
-alias -g cxxlog='~/xplanbase/var/$devsite/log/cxxserver.log'
+ts_color="dark"
+log_name_color="yellow"
+pid_color="bold blue"
+bracket_color="bold blue"
+st_color="green"
+jsalter_color="bold"
+alias -g ackpasscolor="ack --passthru --flush --color"
+alias -g colorizelog="ackpasscolor --color-match=$jsalter_color '\[[^-]+,[0-9]+\]' | ackpasscolor --color-match=$ts_color '^\w+ \d{2} \d{2}:\d{2}:\d{2}.\d{3}' | ackpasscolor --color-match=$log_name_color '[a-z_\.]+\[[^\]]+\]: ' | ackpasscolor --color-match='$pid_color' '\[(-|j)[^\]]+\]:' | ackpasscolor --color-match=$st_color 'File.+line [0-9]+.*'"
+alias -g colorizecxxlog="ackpasscolor --color-match=$ts_color '^\[[^\]]+\]'"
+
+function logc () {
+    cat ~/xplanbase/var/$devsite/log/server.log | colorizelog | less -R -S +G
+}
+
+function log () {
+    less -S +F ~/xplanbase/var/$devsite/log/server.log
+}
+
+function cxxlogc() {
+    less -S +F ~/xplanbase/var/$devsite/log/cxxserver.log
+}
+
+function cxxlog() {
+    cat ~/xplanbase/var/$devsite/log/cxxserver.log | less -S -R +F
+}
+
+function upgradelog() {
+    cat ~/xplanbase/var/$devsite/log/upgrade.log | colorizelog | less -R +G
+}
+
 export SVN_EDITOR="gvim -f"
 
 alias cdb='cd ~/xplanbase/version/$xbranch'
@@ -51,10 +84,10 @@ setbranch() {
 }
 
 # switch branches
-alias 32='export xbranch="1.32.999"; setbranch;'
-alias 33='export xbranch="1.33.999"; setbranch;'
-alias 34='export xbranch="1.34.999"; setbranch;'
-alias tr='export xbranch="1.35.999"; setbranch;' 
+alias 32='export xbranch="1.32.999"; setbranch; devsite_from_pwd;'
+alias 33='export xbranch="1.33.999"; setbranch; devsite_from_pwd'
+alias 34='export xbranch="1.34.999"; setbranch; devsite_from_pwd'
+alias tr='export xbranch="1.35.999"; setbranch; devsite_from_pwd' 
 
 alias xpt='cdb; cd src/py/xpt';
 alias www='cdb; cd data/wwwroot';
@@ -139,6 +172,7 @@ function mktags () {
     done
 }    
 
+alias mk='make FAST=1'
 alias mkxt='ktr && mk -C src/cxx && rtr'
 
 function mkk () {
@@ -147,8 +181,8 @@ function mkk () {
 
 alias mkxl='ktr && mk -C src/xlsm -j8'
 alias mkcx='ktr && mk -C src/cxx'
+alias mkcxc='mk clean -C src/cxx && mkcx -j8'
 alias xcon='telnet localhost 18052'
-alias mk='make FAST=1'
 alias al='tail -f ~/xplanbase/var/$devsite/log/access.log | ack -v "\.js|\.png|\.gif|\.css"'
 
 export TERM=ansi
@@ -166,18 +200,6 @@ alias sr="svn resolve --accept=working"
 alias su="svn update"
 alias sc="svn commit"
 alias sd="svn diff"
-alias tdiff="/cygdrive/c/Program\ Files/TortoiseSVN/bin/TortoiseMerge.exe"
-
-TORTOISE_PROC="/cygdrive/c/Program Files/TortoiseSVN/bin/TortoiseProc.exe"
-
-function ts () {
-    if [[ $# == 1 ]];
-    then
-        2=".";
-    fi
-    cygstart $TORTOISE_PROC /command:$1 /path:$2
-}
-
 alias ex="explorer"
 alias ch="sh ~/xplanbase/hotfix/bin/compile_hotfix.sh"
 
@@ -195,3 +217,40 @@ function f() {
 alias -g ...='../..'
 alias -g ....='../../..'
 alias -g .....='../../../..'
+
+# which changes haven't I merged in 1.34?
+function forgotten_merges() {
+    34
+    svn log -r 128701:HEAD | grep jsalter -A 3 > ~/tmp/34_changes.txt
+    tr
+    svn log -r 128701:HEAD | grep jsalter -A 3 > ~/tmp/tr_changes.txt
+    diff ~/tmp/34_changes.txt ~/tmp/tr_changes.txt
+}    
+
+function cpk () {
+    if [[ $1 == '' ]] then
+        # determine rev to commit as last commit by us
+        rev=`svn log ^/trunk/xplan -l 100 | grep jsalter | head -n 1 | grep '^r[0-9]\+' -o | sed s/r//`
+    else
+        rev=$1
+    fi
+    svn log ^/trunk/xplan -c $rev | tail -n +4 | head -1 > /tmp/mergelogmsg
+    echo merging r$rev...
+    cat /tmp/mergelogmsg
+    svn merge ^/trunk/xplan -c $rev --ignore-ancestry && ts commit . /logmsgfile:`cygpath -w /tmp/mergelogmsg`
+} 
+
+set shell=c:\cygwin\bin\zsh.exe
+
+alias o=cygstart
+
+function pkill () {
+    for pid in $(ps -aW | grep $1 | awk '{ print $4 }');
+        do /bin/kill -f $pid;
+    done
+}
+export ACK_OPTIONS="--type-set idl=.idl"
+
+alias revertall="svn revert -R . *"
+
+alias sel='java -jar `cygpath -a -w ~/downloads/selenium-server-1.0.3/selenium-server.jar` -port 14444'

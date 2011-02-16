@@ -1,4 +1,4 @@
-" set shell=C:\\cygwin\bin\bash.exe
+set shell=C:\\cygwin\bin\zsh.exe
 " set shellcmdflag=-ic
 filetype plugin indent on
 set columns=85
@@ -48,8 +48,6 @@ nnoremap <C-s> :w<CR>
 
 map <F5> :!zsh -ic rtr<CR>
 noremap <F6> :set hlsearch! hlsearch?<CR>
-
-cd c:\xplanbase
 
 " tort log
 map <F10> :!ts log '%:p'<CR>
