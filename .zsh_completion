@@ -1,9 +1,15 @@
 # The following lines were added by compinstall
 
-zstyle ':completion:*' list-colors ''
-zstyle ':completion:*' menu select=3
+zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}zstyle ':completion:*' menu select=3
+
 zstyle ':completion:*' select-prompt %SScrolling active: current selection at %p%s
 zstyle :compinstall filename '/cygdrive/c/users/jsalter/.zsh_completion'
+
+## case-insensitive,partial-word and then substring completion
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
+
+# allow 1 typo
+zstyle ':completion:*:approximate:*' max-errors 1 numeric
 
 autoload -Uz compinit
 compinit

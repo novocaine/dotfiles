@@ -1,14 +1,10 @@
+. ~/.zsh_completion
 export HOME="/cygdrive/c/users/jsalter"
 HISTFILE=~/.histfile
 HISTSIZE=1000
 SAVEHIST=1000
-xbranch=1.35.999
+xbranch=2.1.999
 BRANCHDIR=~/xplanbase/version/$xbranch
-
-autoload -U compinit
-compinit
-
-. ~/.zsh_completion
 
 autoload -U promptinit
 promptinit
@@ -30,7 +26,11 @@ fignore=('*.pyc' '*.dat' '~')
 alias gvimnofork='cyg-wrapper.sh "C:/Program Files (x86)/vim/vim72/gvim.exe" --binary-opt=-c,--cmd,-T,-t,--servername,--remote-send,--remote-expr'
 alias gvim="gvimnofork --fork=1"
 alias gvimr='gvim --remote'
-alias g=gvimr
+
+function g () {
+    gvimr `cygpath -w $1`
+}
+
 
 # edit gvimrc and update it on github
 alias github_zshrc="cp ~/.zshrc ~/.zsh_completion ~/zshrc && cp ~/_vimrc ~/zshrc && cd ~/zshrc && git commit -a -m 'automatic gitpush zshrc' && git push origin master && popd > /dev/null"
@@ -40,9 +40,9 @@ alias ls='ls --color -G'
 alias lsa='ls -altrG'
 alias lsd='ls -d *(/)'
 
-export PATH=/cygdrive/c/python26:/cygdrive/c/python26/Tools/Scripts:~/bin:$PATH
+export PATH=/cygdrive/c/python26/Scripts:/cygdrive/c/python26:/cygdrive/c/python26/Tools/Scripts:~/bin:$PATH
 alias cygset='cygstart ~/bin/cygset'
-export http_proxy=http://webironport
+export http_proxy=http://mel-devproxy1
 
 ts_color="dark"
 log_name_color="yellow"
@@ -58,16 +58,14 @@ function logc () {
     cat ~/xplanbase/var/$devsite/log/server.log | colorizelog | less -R -S +G
 }
 
-function log () {
-    less -S +F ~/xplanbase/var/$devsite/log/server.log
-}
+alias -g slog="~/xplanbase/var/${devsite}/log/server.log"
 
-function cxxlogc() {
-    less -S +F ~/xplanbase/var/$devsite/log/cxxserver.log
+function log () {
+    less +F ~/xplanbase/var/$devsite/log/server.log
 }
 
 function cxxlog() {
-    cat ~/xplanbase/var/$devsite/log/cxxserver.log | less -S -R +F
+    less -S +F ~/xplanbase/var/$devsite/log/cxxserver.log
 }
 
 function upgradelog() {
@@ -87,7 +85,8 @@ setbranch() {
 alias 32='export xbranch="1.32.999"; setbranch; devsite_from_pwd;'
 alias 33='export xbranch="1.33.999"; setbranch; devsite_from_pwd'
 alias 34='export xbranch="1.34.999"; setbranch; devsite_from_pwd'
-alias tr='export xbranch="1.35.999"; setbranch; devsite_from_pwd' 
+alias 20='export xbranch="2.0.999"; setbranch; devsite_from_pwd'
+alias tr='export xbranch="2.1.999"; setbranch; devsite_from_pwd' 
 
 alias xpt='cdb; cd src/py/xpt';
 alias www='cdb; cd data/wwwroot';
@@ -146,7 +145,7 @@ function devsite_from_pwd() {
 
 # map site instances to dir names
 typeset -A site_instances;
-site_instances=(1.33.999 133server 1.34.999 134server 1.35.999 jamesdev);
+site_instances=(1.33.999 133server 1.34.999 134server 2.0.999 20server 2.1.999 jamesdev);
 
 function rtr() {
     devsite_from_pwd;
@@ -203,14 +202,14 @@ alias sd="svn diff"
 alias ex="explorer"
 alias ch="sh ~/xplanbase/hotfix/bin/compile_hotfix.sh"
 
-function jsl () {
-    ~/bin/jslint $1 | grep -v 'Implied global'
-}
+# function jsl () {
+#    ~/bin/jslint $1 | grep -v 'Implied global'
+# }
 
 # setup XPLAN vars
 source ~/bin/xplan_env.sh
 
-function f() {
+function fi() {
     find . -name "$1"
 }
 
@@ -254,3 +253,19 @@ export ACK_OPTIONS="--type-set idl=.idl"
 alias revertall="svn revert -R . *"
 
 alias sel='java -jar `cygpath -a -w ~/downloads/selenium-server-1.0.3/selenium-server.jar` -port 14444'
+
+# type path(+cyg) to make a windows path
+function cyg() {
+    reply=("$(cygpath -w $REPLY)")
+}
+
+alias gchat="ssh -f jsalter@jsalter.id.au -L 2000:talk.google.com:5222 -N"
+
+function ush() {    
+    python bin/udash.py -C $devsite
+}
+
+alias msinclude="cd '/cygdrive/c/Program Files (x86)/Microsoft Visual Studio 9.0/VC/include/'"
+alias rl="bin/reloader.py -d 'var=C:\xplanbase\var\jamesdev' -P"
+alias ipython="python c:/python26/scripts/ipython"
+alias pylint="/cygdrive/c/python26/scripts/pylint.bat"
