@@ -1,94 +1,85 @@
-. ~/.zsh_completion
-export HOME="/cygdrive/c/users/jsalter"
-HISTFILE=~/.histfile
-HISTSIZE=1000
-SAVEHIST=1000
-xbranch=2.1.999
+# Path to your oh-my-zsh configuration.
+export ZSH=$HOME/.oh-my-zsh
+
+# Set name of the theme to load.
+# Look in ~/.oh-my-zsh/themes/
+# Optionally, if you set this to "random", it'll load a random theme each
+# time that oh-my-zsh is loaded.
+export ZSH_THEME="james"
+
+# Set to this to use case-sensitive completion
+# export CASE_SENSITIVE="true"
+
+# Comment this out to disable weekly auto-update checks
+# export DISABLE_AUTO_UPDATE="true"
+
+# Uncomment following line if you want to disable colors in ls
+# export DISABLE_LS_COLORS="true"
+
+# Uncomment following line if you want to disable autosetting terminal title.
+export DISABLE_AUTO_TITLE="true"
+
+# Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
+# Example format: plugins=(rails git textmate ruby lighthouse)
+plugins=(svn osx)
+
+# edit gvimrc and update it on github
+alias github_zshrc="cp ~/.zshrc ~/zshrc && cp ~/.vimrc ~/zshrc && cd ~/zshrc && git commit -a -m 'automatic gitpush zshrc' && git push origin master && popd > /dev/null"
+
+export http_proxy=http://syd-devproxy1:80
+export HTTPS_PROXY=$http_proxy
+export https_proxy=$HTTPS_PROXY
+
+source $ZSH/oh-my-zsh.sh
+
+alias svn=/usr/local/bin/svn
+
+# Customize to your needs...
+export PATH=~/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin
+
+function wf () {
+    dest=`sudo brew --cache $2`
+    fname=${dest##*/}
+    ssh jsalter.id.au "wget $1 -O ~/tmp/$fname"
+    scp jsalter.id.au:~/tmp/$fname /tmp/$fname
+    sudo mv /tmp/$fname ${dest%/*}
+}
+
+source ~/xplan/xplan_env
+export VIRTUAL_ENV_DISABLE_PROMPT=1
+source ~/xplan/ve/bin/activate
+
+alias g="mvim --remote"
+
+export OMNINAMES_LOGDIR=/tmp
+alias on="rm /tmp/omninames-James-Salters-Mac-mini.local.* && omniNames -start 2810"
+alias sz="source ~/.zshrc"
+
+xbranch=trunk
 BRANCHDIR=~/xplanbase/version/$xbranch
-
-autoload -U promptinit
-promptinit
-
-prompt fire red magenta blue white white white
-# munge prompt to contain current devsite
-PS1=`echo $PS1 | sed -e 's/%P}/%P} | %F{blue}$devsite/'`
-setopt hist_ignore_all_dups
-setopt extended_history
-setopt share_history
-setopt auto_pushd
-setopt menu_complete
-setopt auto_cd
-setopt hist_verify
 
 # ignore these in autocomplete
 fignore=('*.pyc' '*.dat' '~')
 
-alias gvimnofork='cyg-wrapper.sh "C:/Program Files (x86)/vim/vim72/gvim.exe" --binary-opt=-c,--cmd,-T,-t,--servername,--remote-send,--remote-expr'
-alias gvim="gvimnofork --fork=1"
-alias gvimr='gvim --remote'
-
-function g () {
-    gvimr `cygpath -w $1`
-}
-
-
-# edit gvimrc and update it on github
-alias github_zshrc="cp ~/.zshrc ~/.zsh_completion ~/zshrc && cp ~/_vimrc ~/zshrc && cd ~/zshrc && git commit -a -m 'automatic gitpush zshrc' && git push origin master && popd > /dev/null"
-alias gvz='gvim ~/.zshrc'
 alias sz='source ~/.zshrc'
-alias ls='ls --color -G'
+alias ls='ls -G'
 alias lsa='ls -altrG'
 alias lsd='ls -d *(/)'
 
-export PATH=/cygdrive/c/python26/Scripts:/cygdrive/c/python26:/cygdrive/c/python26/Tools/Scripts:~/bin:$PATH
-alias cygset='cygstart ~/bin/cygset'
-export http_proxy=http://mel-devproxy1
-
-ts_color="dark"
-log_name_color="yellow"
-pid_color="bold blue"
-bracket_color="bold blue"
-st_color="green"
-jsalter_color="bold"
-alias -g ackpasscolor="ack --passthru --flush --color"
-alias -g colorizelog="ackpasscolor --color-match=$jsalter_color '\[[^-]+,[0-9]+\]' | ackpasscolor --color-match=$ts_color '^\w+ \d{2} \d{2}:\d{2}:\d{2}.\d{3}' | ackpasscolor --color-match=$log_name_color '[a-z_\.]+\[[^\]]+\]: ' | ackpasscolor --color-match='$pid_color' '\[(-|j)[^\]]+\]:' | ackpasscolor --color-match=$st_color 'File.+line [0-9]+.*'"
-alias -g colorizecxxlog="ackpasscolor --color-match=$ts_color '^\[[^\]]+\]'"
-
-function logc () {
-    cat ~/xplanbase/var/$devsite/log/server.log | colorizelog | less -R -S +G
-}
-
-alias -g slog="~/xplanbase/var/${devsite}/log/server.log"
-
-function log () {
-    less +F ~/xplanbase/var/$devsite/log/server.log
-}
-
-function cxxlog() {
-    less -S +F ~/xplanbase/var/$devsite/log/cxxserver.log
-}
-
-function upgradelog() {
-    cat ~/xplanbase/var/$devsite/log/upgrade.log | colorizelog | less -R +G
-}
-
-export SVN_EDITOR="gvim -f"
-
-alias cdb='cd ~/xplanbase/version/$xbranch'
-
-# persistent branch setting stuff
-setbranch() {
-    cd ~/xplanbase/version/$xbranch;
-}
-
-# switch branches
-alias 32='export xbranch="1.32.999"; setbranch; devsite_from_pwd;'
-alias 33='export xbranch="1.33.999"; setbranch; devsite_from_pwd'
-alias 34='export xbranch="1.34.999"; setbranch; devsite_from_pwd'
-alias 20='export xbranch="2.0.999"; setbranch; devsite_from_pwd'
-alias tr='export xbranch="2.1.999"; setbranch; devsite_from_pwd' 
+alias cdb='cd ~/xplan/$xbranch'
+alias cds='cd `echo $PWD | gsed -e "s|/Users/jsalter/xplan/[^/]\+|/Users/jsalter/xplan/$xbranch|"`'
+alias tr='export xbranch=trunk; cds;'
+alias 20='export xbranch=2.0.999; cds;'
+alias 21='export xbranch=2.1.999; cds;'
+alias 22='export xbranch=2.2.999; cds'
+alias 23='export xbranch=2.3.999; cds'
+alias 24='export xbranch=2.4.999; cds'
+alias 25='export xbranch=2.5.999; cds'
+alias 34='export xbranch=1.34.999; cds'
 
 alias xpt='cdb; cd src/py/xpt';
+alias idl='cdb; cd idl';
+alias ejs='www; cd ejs';
 alias www='cdb; cd data/wwwroot';
 alias wwwroot=www;
 alias js='www; cd js';
@@ -96,135 +87,22 @@ alias css='www; cd css';
 alias ih='cdb; cd data/ihtml';
 alias ihtml=ih;
 alias cxx='cdb; cd src/cxx';
-alias hf='cd ~/xplanbase/hotfix';
+alias hf='cd ~/xplan/hotfix';
 alias hotfix=hf;
-alias var='cd ~/xplanbase/var';
-
+alias var='cd ~/xplan/var';
 alias ack='ack --ignore-dir js.min --ignore-dir css.min';
-export ACK_PAGER='less -R'
-alias winpdb='cygstart "c:\python26\scripts\winpdb.bat"';
-alias sitectrl="/cygdrive/c/xplanbase/sitemgr/sitectrl";
+export ACK_PAGER='less -FRX'
+export ACK_OPTIONS="--type-set idl=.idl"
+alias svnm="svn merge --ignore-ancestry" 
+export CTAGS=/usr/local/Cellar/ctags/5.8/bin/ctags
+alias ch="sh ~/xplan/hotfix/bin/compile_hotfix.sh"
+export EDITOR=vim;
+export PYTHONPATH=$PYTHONPATH:~/xplan/trunk/bin:~/xplan/trunk/py:~/xplan/trunk/lib/py:~/xplan/trunk/tools/py:~/xplan/trunk/src/py:~/xplan/trunk/lib/arch/darwin-x86:~/xplan/trunk/lib/arch/darwin-x86/pyxtools
+export PYPY=~/xplan/ve_pypy/bin/pypy
 
-devsite=jamesdev;
-function ds() {
-    export devsite=$1;
+function slog() {
+    svn log $*[1,-2] | sed -n "/$*[$#]/,/----$/ p"
 }
-
-function restart_site() {
-    echo "Restarting site $devsite"
-    sitectrl kill $1 && sitectrl start $1;
-    while sitectrl status | grep "$1.*RUNNING.*(8080)" > /dev/null
-    do
-        sleep 1
-    done
-
-    # echo server status
-    sitectrl status | grep "$1."    
-}
-
-function kill_site() {
-    echo "Killing site $devsite"
-    sitectrl kill $1
-}
-
-alias webget='curl -x webironport:80 -s'
-ABC_RSS="http://www.abc.net.au/news/syndicate/topstoriesrss.xml"
-
-function abc_news() {
-    webget $ABC_RSS | python xml_printer.py
-}
-
-function random_abc_headline() {
-    webget $ABC_RSS | python "c:\users\jsalter\bin\xml_printer.py" random
-}
-
-function devsite_from_pwd() {
-    ver=`echo $PWD | grep -o 'version/\([^/]*\)' | sed -e 's/version\///'`;
-    devsite=${site_instances[${ver}]};
-}
-
-# map site instances to dir names
-typeset -A site_instances;
-site_instances=(1.33.999 133server 1.34.999 134server 2.0.999 20server 2.1.999 jamesdev);
-
-function rtr() {
-    devsite_from_pwd;
-    random_abc_headline & restart_site $devsite;
-}
-
-function ktr() {
-    devsite_from_pwd;
-    kill_site $devsite;
-}
-
-alias ktr='kill_site $devsite';
-
-alias stalk='python bin/runNightstalker_win32.py -c "Single-Instance Site (No IPS)" -v ../var/jamesdev'
-# disable import tagging for ctags; this avoids always jumping to the bazillion
-# import definitions for a given method
-alias ctags='ctags --python-kinds=-i'
-
-function mktags () {
-    for dir in $BRANCHDIR/src/py $BRANCHDIR/src/cxx $BRANCHDIR/test/py $BRANCHDIR/include ~/xplanbase/build/vc90/omniORB-4.1-20100317 $BRANCHDIR/data/wwwroot/js
-    do
-        cd $dir && ctags -R
-    done
-}    
-
-alias mk='make FAST=1'
-alias mkxt='ktr && mk -C src/cxx && rtr'
-
-function mkk () {
-    ktr && mkw $* && rtr
-}
-
-alias mkxl='ktr && mk -C src/xlsm -j8'
-alias mkcx='ktr && mk -C src/cxx'
-alias mkcxc='mk clean -C src/cxx && mkcx -j8'
-alias xcon='telnet localhost 18052'
-alias al='tail -f ~/xplanbase/var/$devsite/log/access.log | ack -v "\.js|\.png|\.gif|\.css"'
-
-export TERM=ansi
-
-alias ss='svn status | cut -c 9- | python `cygpath -w ~/bin/recentfiles.py`'
-num () {
-        ss | awk -v lines=$1 'NR==lines' | cut -f 3 | tr '\n' ' '
-}
-
-onwards () {
-        ss | awk -v lines=$1 'NR>=lines' | cut -f 3 | tr '\n' ' '
-}
-
-alias sr="svn resolve --accept=working"
-alias su="svn update"
-alias sc="svn commit"
-alias sd="svn diff"
-alias ex="explorer"
-alias ch="sh ~/xplanbase/hotfix/bin/compile_hotfix.sh"
-
-# function jsl () {
-#    ~/bin/jslint $1 | grep -v 'Implied global'
-# }
-
-# setup XPLAN vars
-source ~/bin/xplan_env.sh
-
-function fi() {
-    find . -name "$1"
-}
-
-alias -g ...='../..'
-alias -g ....='../../..'
-alias -g .....='../../../..'
-
-# which changes haven't I merged in 1.34?
-function forgotten_merges() {
-    34
-    svn log -r 128701:HEAD | grep jsalter -A 3 > ~/tmp/34_changes.txt
-    tr
-    svn log -r 128701:HEAD | grep jsalter -A 3 > ~/tmp/tr_changes.txt
-    diff ~/tmp/34_changes.txt ~/tmp/tr_changes.txt
-}    
 
 function cpk () {
     if [[ $1 == '' ]] then
@@ -234,38 +112,70 @@ function cpk () {
         rev=$1
     fi
     svn log ^/trunk/xplan -c $rev | tail -n +4 | head -1 > /tmp/mergelogmsg
-    echo merging r$rev...
     cat /tmp/mergelogmsg
-    svn merge ^/trunk/xplan -c $rev --ignore-ancestry && ts commit . /logmsgfile:`cygpath -w /tmp/mergelogmsg`
-} 
-
-set shell=c:\cygwin\bin\zsh.exe
-
-alias o=cygstart
-
-function pkill () {
-    for pid in $(ps -aW | grep $1 | awk '{ print $4 }');
-        do /bin/kill -f $pid;
-    done
-}
-export ACK_OPTIONS="--type-set idl=.idl"
-
-alias revertall="svn revert -R . *"
-
-alias sel='java -jar `cygpath -a -w ~/downloads/selenium-server-1.0.3/selenium-server.jar` -port 14444'
-
-# type path(+cyg) to make a windows path
-function cyg() {
-    reply=("$(cygpath -w $REPLY)")
+    echo merging r$rev...
+    svn update
+    svn merge ^/trunk/xplan -c $rev --ignore-ancestry
 }
 
-alias gchat="ssh -f jsalter@jsalter.id.au -L 2000:talk.google.com:5222 -N"
-
-function ush() {    
-    python bin/udash.py -C $devsite
+ts () {
+    if [[ $# = 1 ]]
+    then
+            2="."
+    fi
+    abspath=`cd $2; pwd`;
+    abspath=`echo $abspath | sed -e s+/Users/jsalter++`
+    p=Z:/jsalter\ On\ My\ Mac$abspath
+    echo $p
+    "/Applications/VMware Fusion.app/Contents/Library/vmrun" -T fusion -gu "James Salter" -gp novogah7 runProgramInGuest ~/Documents/Virtual\ Machines.localized/Windows\ 7.vmwarevm/Windows\ 7.vmx -interactive -noWait "c:\Program Files\TortoiseSVN\bin\proc.bat" "$1" $p $3 $4
 }
 
-alias msinclude="cd '/cygdrive/c/Program Files (x86)/Microsoft Visual Studio 9.0/VC/include/'"
-alias rl="bin/reloader.py -d 'var=C:\xplanbase\var\jamesdev' -P"
-alias ipython="python c:/python26/scripts/ipython"
-alias pylint="/cygdrive/c/python26/scripts/pylint.bat"
+qack () {
+    mdfind -0 -onlyin . $1 | xargs -0 ack -H $1 $2 $3 $4 $5
+}
+
+gack () {
+    ack -G GNUmakefile -a $1
+}
+
+alias sr='svn resolved'
+
+st () {
+    svn st | sed -e 's+^\([^ -].\{7\}\)+\1mvim:\/\/open\?url=file:\/\/'"$PWD"'\/+'
+}
+
+alias di='svn diff'
+
+uhf () {
+    curl --form process=__all__ --form hotfix=@$1 --form submit=Upload https://xplan.iress.com.au/$2/hotfix --form params=$3 --form params=$4
+}
+
+alias winpdb='/Library/Frameworks/Python.framework/Versions/2.7/bin/python /Users/jsalter/xplan/ve/lib/python2.7/site-packages/winpdb.py'
+
+alias mkxl='make -C src/xlsm -j3'
+
+alias nt="XFUDGE_SITENAME=autotest nosetests -c ~/xplan/trunk/src/py/nose-developer.cfg"
+alias gdbnt="gdb --args python /Users/jsalter/xplan/ve/bin/nosetests -c ~/xplan/trunk/src/py/nose-developer.cfg"
+alias xtest='cd ~/xplan/trunk/src/py/xtest'
+
+export LESS=-I
+
+alias gdbcx="gdb --pid=`ps -acx | grep cxxserver | cut -d ' ' -f 1`"
+alias top='top -o cpu'
+
+function revs_for_osc () {
+    # $1 is 'since'
+    svn log -r$1:HEAD | grep "OSC $2" -B 2 | grep '^r' | cut -b 2- | cut -d ' ' -f 1 | paste -d ' ' -s -
+}
+
+function merge_trunk () {
+    svn update
+    svnm -c $1 ^/trunk/xplan
+}
+
+unalias history
+
+# enable core dumps
+ulimit -c unlimited
+
+alias ss='python bin/sitestart.py -d var=default'
