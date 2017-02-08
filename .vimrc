@@ -20,13 +20,10 @@ set number
 set ignorecase
 filetype on
 
-set tags=~/xplan/trunk/src/py/tags,~/xplan/trunk/src/cxx/tags,/usr/local/include/omniORB4/tags,~/xplan/trunk/test/py/tags,~/xplan/trunk/include/tags,~/xplan/trunk/data/wwwroot/js/tags
-
 set statusline=%<%F%h%m%r%h%w%y\ [%l,%v]\ %P\ %{SyntasticStatuslineFlag()}
 set laststatus=2
 
 set viminfo='1000,f1,<500,@100,:100,/100,%100 
-let @d='iimport rpdb2; rpdb2.start_embedded_debugger("rdb")'
 
 " Ctrl-j/k deletes blank line below/above, and Alt-j/k inserts.
 nnoremap <silent><C-j> m`:silent +g/\m^\s*$/d<CR>``:noh<CR>
